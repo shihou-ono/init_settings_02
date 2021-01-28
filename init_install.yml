@@ -1,0 +1,69 @@
+---
+- hosts: all
+  gather_facts: true
+
+  tasks:
+
+    - block:
+      - name: 'yum update'
+        yum: 
+          name: '*'
+          state: latest
+    
+      - name: 'install tmux'
+        yum:
+          name: 'tmux'
+          state: latest
+      
+      - name: 'install docker'
+        yum:
+          name: 'docker'
+          state: latest
+    
+      - name: Install docker-compose
+        get_url:
+          url: "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-Linux-x86_64"
+          dest: /usr/local/bin/docker-compose
+          mode: +x
+
+      - name: Start service docker, if not started
+        service:
+          name: docker
+          state: started
+
+      - name: enable service docker
+        service:
+          name: docker
+          enabled: yes
+
+      - name: add group docker
+        group:
+          name: docker
+          state: present
+
+      - name: add user to docker group
+        user:
+          name: "{{ ansible_env.USER }}"
+          group: docker
+          append: yes
+
+      become: true
+  
+    - name: 'list dotfiles'
+      find:
+        paths: '{{ ansible_env.HOME }}/setting/dotfiles'
+        hidden: yes
+      register: file_list
+ 
+ #  - debug:
+ #      msg: "{{ item.path | basename }}"
+ #    with_items: "{{ file_list.files }}"
+ 
+    - name: 'make link'
+      file:
+        src: "{{ item.path }}"
+        path: "{{ ansible_env.HOME }}/{{ item.path | basename }}"
+        state: link
+        force: yes
+      with_items: "{{ file_list.files }}"
+
