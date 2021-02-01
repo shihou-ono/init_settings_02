@@ -26,7 +26,7 @@
           dest: /usr/local/bin/docker-compose
           mode: +x
 
-      - name: Start service docker, if not started
+      - name: Start service docker
         service:
           name: docker
           state: started
@@ -54,10 +54,6 @@
         paths: '{{ ansible_env.HOME }}/setting/dotfiles'
         hidden: yes
       register: file_list
- 
- #  - debug:
- #      msg: "{{ item.path | basename }}"
- #    with_items: "{{ file_list.files }}"
  
     - name: 'make link'
       file:
