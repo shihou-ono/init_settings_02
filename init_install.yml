@@ -51,7 +51,7 @@
   
     - name: 'list dotfiles'
       find:
-        paths: '{{ ansible_env.HOME }}/setting/dotfiles'
+        paths: '{{ ansible_env.HOME }}/init_settings/dotfiles'
         hidden: yes
       register: file_list
  
