@@ -19,6 +19,10 @@
         yum:
           name: 'docker'
           state: latest
+
+      - name: 'dummy'
+        debug:
+          msg: "dummy"
     
       - name: Install docker-compose
         get_url:
