@@ -9,22 +9,18 @@
         yum: 
           name: '*'
           state: latest
-    
-      - name: 'install tmux'
-        yum:
-          name: 'tmux'
-          state: latest
-      
-      - name: 'install docker'
-        yum:
-          name: 'docker'
-          state: latest
 
-      - name: Install docker-compose
-        get_url:
-          url: "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-Linux-x86_64"
-          dest: /usr/local/bin/docker-compose
-          mode: +x
+      - name: 'install apps'
+        yum:
+          name:
+            - epel-release
+            - yum-utils
+            - python3-setuptools
+            - bash-completion
+            - tmux
+            - docker
+          state: latest
+    
 
       - name: Start service docker
         service:
@@ -46,6 +42,27 @@
           name: "{{ ansible_env.USER }}"
           group: docker
           append: yes
+      - name: 'pip update'
+        pip:
+          name: pip
+          state: latest
+
+      - name: 'instal virtualenv'
+        pip:
+          name: virtualenv
+          executable: pip3
+
+      - name: Create Python3-virtual environment folder
+        file:
+          name: /home/centos/venv
+          state: directory
+
+      - name: 'make venv'
+        pip:
+          virtualenv: /home/centos/venv
+          virtualenv_command: /usr/local/bin/virtualenv
+          virtualenv_python: python3.6
+          requirements: /home/centos/init_settings/requirements.txt
 
       become: true
   
