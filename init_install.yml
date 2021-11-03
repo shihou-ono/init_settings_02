@@ -15,6 +15,9 @@
           name:
             - epel-release
             - yum-utils
+              #            - libselinux-python3
+            - python3-devel
+            - python3-libs
             - python3-setuptools
             - bash-completion
             - tmux
@@ -42,6 +45,9 @@
           name: "{{ ansible_env.USER }}"
           group: docker
           append: yes
+
+      become: true
+    - block:
       - name: 'pip update'
         pip:
           name: pip
@@ -54,21 +60,22 @@
 
       - name: Create Python3-virtual environment folder
         file:
-          name: /home/centos/venv
+          name: "{{ ansible_env.HOME }}/venv"
           state: directory
 
       - name: 'make venv'
         pip:
-          virtualenv: /home/centos/venv
+          virtualenv: "{{ ansible_env.HOME }}/venv"
           virtualenv_command: /usr/local/bin/virtualenv
-          virtualenv_python: python3.6
-          requirements: /home/centos/init_settings/requirements.txt
-
+          virtualenv_python: python3.7
+          requirements: "{{ ansible_env.HOME }}/init_settings_02/requirements.txt"
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
       become: true
   
     - name: 'list dotfiles'
       find:
-        paths: '{{ ansible_env.HOME }}/init_settings/dotfiles'
+        paths: '{{ ansible_env.HOME }}/init_settings_02/dotfiles'
         hidden: yes
       register: file_list
  
